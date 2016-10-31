@@ -1,0 +1,36 @@
+repositories {
+  mavenCentral()
+}
+
+apply plugin: 'java'
+
+dependencies{
+  compile 'org.apache.commons:commons-lang3:3.4'
+}
+
+sourceSets {
+  main.java.srcDir 'src/main'
+  test.java.srcDir 'src/test'
+}
+
+jar{
+  from configurations.compile.collect { zipTree it }
+  manifest.attributes 'Main-Class': 'com.globant.gradleTutorial.Main'
+}
+
+task run(type: JavaExec, dependsOn: classes){
+  main 'com.globant.gradleTutorial.Main'
+  classpath sourceSets.main.runtimeClasspath
+}
+
+task runJar(type: Exec, dependsOn: jar){
+  executable 'java'
+  args '-jar', "$jar.archivePath"
+}
+
+task writeGreeting{
+  //onlyIf{!file('greeting.txt').text.equals('Hello, fellow citizen!')}
+  outputs.file file('greeting.txt')
+} << {
+  file('greeting.txt').text = 'Hello, fellow citizen!'
+}
